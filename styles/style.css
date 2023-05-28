@@ -1,0 +1,149 @@
+body {
+    margin: 40px auto;
+    max-width: 1200px;
+    width: 100%;
+    background-color: #383008;
+    color: white;
+    font-family: sans-serif;
+    font-size: 1rem;
+}
+
+a {
+    color: white;
+}
+
+.top_bar {
+    /* logo_and_titleとmenuをflexで並べる */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: #786838;
+}
+
+.logo_and_title {
+    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 5px 5px 5px;
+}
+
+.logo img {
+    display: block;
+    border-radius: 50%;
+}
+
+.content {
+    max-width: 1000px;
+    width: 100%;
+}
+
+.page_title a {
+    margin-left: 12px;
+    display: block;
+    padding: 5px 10px 5px 10px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-decoration: none;
+    color: white;
+}
+
+.page_title a:hover {
+    text-decoration: underline;
+    background-color: #887848;
+}
+
+.menu {
+    display: block;
+    /* menuのa要素をdisplay:flexで並べる */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu a {
+    margin: 2px 5px 2px 0px;
+    display: block;
+    padding: 5px 5px 5px 5px;
+    font-size: 1rem;
+    color: white;
+    background-color: #887848;
+}
+
+.menu a:hover {
+    background-color: #988850;
+}
+
+
+h1 {
+    margin: 20px 20px;
+}
+h2 {
+    margin: 20px 20px;
+}
+h3 {
+    margin: 20px 20px;
+}
+h4 {
+    margin: 20px 20px;
+}
+h5 {
+    margin: 20px 20px;
+}
+h6 {
+    margin: 20px 20px;
+}
+p {
+    margin: 20px 20px;
+}
+
+figure {
+    /* マージンを合わせるためにinheritが必要 */
+    margin: 20px 20px;
+    max-width: 800px;
+    width: 100%;
+    height: auto;
+}
+
+figcaption {
+    text-align: center;
+    font-weight: bold;
+}
+
+img {
+    max-width: 100%;
+}
+
+pre.code_block{
+    /* マージン合わせ */
+    margin: 20px 20px;
+    padding: 20px 20px 20px 20px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    max-width: 940px;
+    width: 100%;
+    background-color: black;
+    overflow: auto;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    color: white;
+    background-color: black;
+}
+
+footer {
+    margin-top: 20px;
+    width: 100%;
+}
+
+.footer_info {
+    padding: 5px 20px 5px 20px;
+    background-color: #786838;
+    color: white;
+}
