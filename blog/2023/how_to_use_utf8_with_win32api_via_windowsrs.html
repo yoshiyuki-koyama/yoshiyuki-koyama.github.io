@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="/styles/style.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/styles/blog.css">
+    <title>
+        (未解決)windows-rs経由のwin32APIでUTF-8を使ってみた -- 日常非同期ブログ
+    </title>
+</head>
+<body>
+    <header>
+    <div class="top_bar">
+    <div class="logo_and_title">
+        <div class="logo">
+            <a href="https://yoshiyuki-koyama.github.io/">
+                <img src="/metronome.png" width="63" height="63" alt="Site Top">
+            </a>
+        </div>
+        <div class="page_title">
+            <a href="https://yoshiyuki-koyama.github.io/blog/index.html">日常非同期ブログ</a>
+        </div>
+    </div>
+    <div class="menu">
+        <a href="https://yoshiyuki-koyama.github.io/index.html">サイトトップ</a>
+        <a href="https://yoshiyuki-koyama.github.io/products/">制作物</a>
+        <a href="https://yoshiyuki-koyama.github.io/blog/">ブログ</a>
+        <a href="https://yoshiyuki-koyama.github.io/about.html">このサイトについて</a>
+    </div>
+</div>
+    </header>
+    <div class="content_container">
+        <div class="content_higher">
+            <h2>(未解決)windows-rs経由のwin32APIでUTF-8を使ってみた</h2>
+<p class="blog_page_date_and_update">Published:2023-06-10
+
+</p>
+<p class="blog_page_summary">--- Rust から簡単に使用するために、 win32api で UTF-8 を使えるように設定してみた際の検討と結果 ---</p>
+<br>
+            </div>
+        <div class="content">
+        
+    <h3>前置き</h3>
+    <p>
+        現在開発中のアプリではRustから windows クレートを使用して win32API を利用しています。
+    </p>
+    <p>
+        Rust の文字列型には<code>String</code>と<code>&amp;str</code>がありますがこれらは UTF-8 で処理されます。
+        一方、win32api は、言語によって異なる CodePage に対応した -A タイプの API と、UTF-16 に対応した -W タイプの API があります。
+    </p>
+    <p>
+        開発中のアプリでは -W タイプ(UTF-16)の API を使っていますが、 UTF-16 は Rust から扱うと少し不便なことが多いです。
+        そこで、プロセスの CodePage を UTF-8 にすることで実装を簡単にできるのでは、と思い、試してみました。
+    </p>
+    <p>
+        先に書いておきますが、ある程度はできたものの一部解決できてない問題があるため、結局 UTF-16 を使うように戻しました。
+    </p>
+    <h3>方法</h3>
+    <p>
+        Microsoft 公式にある下記記事を参考にします（ fusion マニフェストのほう）。assemblyIdentity の name や version はアプリに合わせました。
+    </p>
+    <p>
+        <a href="https://learn.microsoft.com/ja-jp/windows/apps/design/globalizing/use-utf8-code-page">Windows アプリで UTF-8 コード ページを使用する - Windows apps Microsoft Learn</a>
+    </p>
+    <h3>開発環境への組み込み方</h3>
+    <p>
+        上記サイトにある通りマニフェストを適用するためには mt.exe を実行する必要があります(他の方法もあるとは思いますがこれが一番簡単そう)。
+    </p>
+    <p>
+        プログラムのデバッグ時は、デバッグビルド→マニフェスト適用→デバッグ実行という手順を踏むことになりますが、この手順は頻繁に行うため１操作でできるようにしたいところです。
+        最初はRustのビルドスクリプトで実現しようと思ったのですが、どうもビルド後のコマンド実行はできない(?)ようです。
+        それ用のツールもあるらしいのですが、今回は、開発環境として使っている VisualStduio Code のlaunch.jsonで設定できるタスク(tasks.json)で実現できそうなのでこれを使ってみました。
+    </p>
+    <h3>launch.json と tasks.json</h3>
+    <p>
+        私はデバッガとして Microsoft の C/C++ for Visual Studio Codeを使っています(なので CodeLLDB の場合と書き方が変わるかもしれません)。
+    </p>
+    <p>
+        launch.json に preLaunchTask としてタスクを登録します。タスクの内容は tasks.json に記載します。今回の場合は、デバッグビルドとマニフェスト適用がタスクとなります。
+        なお、preLaunchTask には複数のタスクは設定できないので、まとめるためのタスクをもう一つ追加で作り、それに dependsOn で複数のタスクを設定することで複数タスクの実行が可能になります（下記の参考リンク）。
+        また、デバッグビルド→ビルド後の実行ファイルにマニフェスト適用という流れなので、順番を指定する dependsOrder も設定する必要があります。
+    </p>
+    <p>参考：<a href="https://code.visualstudio.com/Docs/editor/tasks#_compound-tasks">Tasks in Visual Studio Code</a></p>
+<code>launch.json</code>の内容
+<pre class="code_block"><code>{
+    &quot;version&quot;: &quot;0.2.0&quot;,
+    &quot;configurations&quot;: [
+        {
+            ~ 略 ~
+            &quot;preLaunchTask&quot;: &quot;debug tasks&quot;,
+            ~ 略 ~
+        }
+    ],
+}</code></pre>
+<code>tasks.json</code>の内容
+<pre class="code_block"><code>{
+	&quot;version&quot;: &quot;2.0.0&quot;,
+	&quot;tasks&quot;: [
+        {
+            &quot;label&quot;: &quot;debug build&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;command&quot;: &quot;cargo&quot;,
+            &quot;args&quot;: [
+				&quot;build&quot;
+			],
+            &quot;problemMatcher&quot;: [
+                &quot;$rustc&quot;
+            ]
+        },
+        {
+            &quot;label&quot;: &quot;set codepage&quot;,
+            &quot;type&quot;: &quot;shell&quot;,
+            &quot;command&quot;: &quot;C:&#92;&#92;Program Files (x86)&#92;&#92;Windows Kits&#92;&#92;10&#92;&#92;bin&#92;&#92;10.0.22000.0&#92;&#92;x64&#92;&#92;mt.exe&quot;,
+            &quot;args&quot;: [
+                &quot;-manifest&quot;,
+                &quot;${workspaceFolder}&#92;&#92;set_codepage_to_utf8.manifest&quot;,
+                &quot;-outputresource:${workspaceFolder}&#92;&#92;target&#92;&#92;debug&#92;&#92;my_app.exe;#1&quot;
+			],
+        },
+        {
+            &quot;label&quot;: &quot;debug tasks&quot;,
+            &quot;dependsOrder&quot;: &quot;sequence&quot;,
+            &quot;dependsOn&quot;: [
+                &quot;debug build&quot;,
+                &quot;set codepage&quot;,
+            ]
+        }
+	]
+}</code></pre>
+    <h3>できたけど問題あり</h3>
+    <p>
+        上記を設定しデバッグ実行します。すると、マニフェストが適用されたプロセスが UTF-8対応され、-AタイプのAPIを使って日本語などの表示が正しく表示などが行えるように、、、なったと思ったのですが、なぜか文字化けしている表示が一部出てきました。
+    </p>
+    <p>
+        正しく表示されたものは、ウィンドウの名前(<code>CreateWindowExA()</code>の<code>lpWindowName</code>)やコンボボックスへの文字列追加(<code>SendMessageA()</code>で<code>CB_ADDSTRING</code>を送信)などです。
+        文字化けが起こってしまったものは、ステータスバーへのテキスト設定(<code>SendMessageA()</code>で<code>SB_SETTEXTA</code>を送信)やスタティックコントロールへの文字列描画(<code>DrawTextA()</code>)などです。
+    </p>
+    <p>
+        原因については調べたのですが、あまりわかっていません。一応、下記ページの内容が関連しているのではないかなと思っています。
+    </p>
+    <p>
+        <a href="https://learn.microsoft.com/ja-jp/windows/win32/intl/automatic-message-translation">メッセージの自動翻訳 - Win32 apps Microsoft Learn.htm</a>
+    </p>
+    <p>
+        <code>SB_SETTEXTA</code>は下記ページに記載されていないメッセージなので対応されておらず、スタティックコントロールへの文字列描画(<code>DrawTextA()</code>)は内部でどんなメッセージが使用されているか不明ですが、メインのウィンドウから呼ばれているためウィンドウクラスが違うのかなあと思っています。
+    </p>
+    <h3>その他（やってみてわかったことなど）</h3>
+    <ul>
+        <li>win32api には -W タイプや -A タイプがなく UTF-16 を強制される API が多少ある( DirectX 関連とか)。</li>
+        <li>UTF-8 を使えるようになっても、win32api では null 文字終端が必要なので、Rust の<code>String</code>と<code>&amp;str</code>がそのまま使えるわけではない。<code>Cstring</code>を使う必要がある。</li>
+        <li>win32apiを利用しない部分でもUTF-8対応になる。<code>println!()</code>などの出力もUTF-8対応にできる。</li>
+    </ul>
+    <h3>まとめ</h3>
+    <p>
+        ある程度実現できたものの残りの問題が解決できず今回は元に戻って UTF-16 を使うことにしました。
+    </p>
+    <p>
+        また、その他で書いたように、仮に問題が解決できたとしても UTF-16 を完全に使わないようにはできず、また、UTF-8 にしてもある程度の前処理が必要となるため、思ったほどの効果が得られないことがわかりました（UTF-16 を扱うための構造体を実装済みだったことも大きいです）。この取り組みはしばらく放置することになりそうです。
+    </p>
+
+        </div>
+        <div class="content_lower">
+            <div class="blog_prev_next_post">
+        <a href="https://yoshiyuki-koyama.github.io/blog/2023/my_first_post.html">
+            前の投稿: 最初の投稿
+        </a>
+        <a href="https://yoshiyuki-koyama.github.io/blog/2023/logicool_lift_mouse.html">
+            次の投稿: マウスを新調しました
+        </a>
+        </div>
+        </div>
+    </div>
+    <footer>
+        <div class="footer_info">
+        Copyright &copy;2023 Yoshiyuki Koyama. All right reserved.
+        <div class="footer_info">
+    </footer>
+</body>
+</html>

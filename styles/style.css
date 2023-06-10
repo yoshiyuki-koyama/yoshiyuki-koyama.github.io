@@ -131,6 +131,7 @@ pre.code_block{
 }
 
 code {
+    margin: 2px 2px;
     font-family: 'Courier New', Courier, monospace;
     font-size: 0.9rem;
     color: white;
