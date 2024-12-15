@@ -3,8 +3,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="/favicon.png">
     <link rel="stylesheet" type="text/css" media="screen" href="/styles/style.css">
 <link rel="stylesheet" type="text/css" media="screen" href="/styles/blog.css">
+<link rel="stylesheet" type="text/css" media="screen" href="/styles/blog_page.css">
     <title>
         (未解決)windows-rs経由のwin32APIでUTF-8を使ってみた -- 日常非同期ブログ
     </title>
@@ -32,16 +34,17 @@
     </header>
     <div class="content_container">
         <div class="content_higher">
-            <h2>(未解決)windows-rs経由のwin32APIでUTF-8を使ってみた</h2>
+            <h1>(未解決)windows-rs経由のwin32APIでUTF-8を使ってみた</h1>
 <p class="blog_page_date_and_update">Published:2023-06-10
 
 </p>
 <p class="blog_page_summary">--- Rust から簡単に使用するために、 win32api で UTF-8 を使えるように設定してみた際の検討と結果 ---</p>
 <br>
-            </div>
+        </div>
         <div class="content">
-        
-    <h3>前置き</h3>
+        <div class="blog_content">
+    
+    <h2>前置き</h2>
     <p>
         現在開発中のアプリではRustから windows クレートを使用して win32API を利用しています。
     </p>
@@ -56,14 +59,14 @@
     <p>
         先に書いておきますが、ある程度はできたものの一部解決できてない問題があるため、結局 UTF-16 を使うように戻しました。
     </p>
-    <h3>方法</h3>
+    <h2>方法</h2>
     <p>
         Microsoft 公式にある下記記事を参考にします（ fusion マニフェストのほう）。assemblyIdentity の name や version はアプリに合わせました。
     </p>
     <p>
         <a href="https://learn.microsoft.com/ja-jp/windows/apps/design/globalizing/use-utf8-code-page">Windows アプリで UTF-8 コード ページを使用する - Windows apps Microsoft Learn</a>
     </p>
-    <h3>開発環境への組み込み方</h3>
+    <h2>開発環境への組み込み方</h2>
     <p>
         上記サイトにある通りマニフェストを適用するためには mt.exe を実行する必要があります(他の方法もあるとは思いますがこれが一番簡単そう)。
     </p>
@@ -72,7 +75,7 @@
         最初はRustのビルドスクリプトで実現しようと思ったのですが、どうもビルド後のコマンド実行はできない(?)ようです。
         それ用のツールもあるらしいのですが、今回は、開発環境として使っている VisualStduio Code のlaunch.jsonで設定できるタスク(tasks.json)で実現できそうなのでこれを使ってみました。
     </p>
-    <h3>launch.json と tasks.json</h3>
+    <h2>launch.json と tasks.json</h2>
     <p>
         私はデバッガとして Microsoft の C/C++ for Visual Studio Codeを使っています(なので CodeLLDB の場合と書き方が変わるかもしれません)。
     </p>
@@ -128,7 +131,7 @@
         }
 	]
 }</code></pre>
-    <h3>できたけど問題あり</h3>
+    <h2>できたけど問題あり</h2>
     <p>
         上記を設定しデバッグ実行します。すると、マニフェストが適用されたプロセスが UTF-8対応され、-AタイプのAPIを使って日本語などの表示が正しく表示などが行えるように、、、なったと思ったのですが、なぜか文字化けしている表示が一部出てきました。
     </p>
@@ -145,13 +148,13 @@
     <p>
         <code>SB_SETTEXTA</code>は下記ページに記載されていないメッセージなので対応されておらず、スタティックコントロールへの文字列描画(<code>DrawTextA()</code>)は内部でどんなメッセージが使用されているか不明ですが、メインのウィンドウから呼ばれているためウィンドウクラスが違うのかなあと思っています。
     </p>
-    <h3>その他（やってみてわかったことなど）</h3>
+    <h2>その他（やってみてわかったことなど）</h2>
     <ul>
         <li>win32api には -W タイプや -A タイプがなく UTF-16 を強制される API が多少ある( DirectX 関連とか)。</li>
         <li>UTF-8 を使えるようになっても、win32api では null 文字終端が必要なので、Rust の<code>String</code>と<code>&amp;str</code>がそのまま使えるわけではない。<code>Cstring</code>を使う必要がある。</li>
         <li>win32apiを利用しない部分でもUTF-8対応になる。<code>println!()</code>などの出力もUTF-8対応にできる。</li>
     </ul>
-    <h3>まとめ</h3>
+    <h2>まとめ</h2>
     <p>
         ある程度実現できたものの残りの問題が解決できず今回は元に戻って UTF-16 を使うことにしました。
     </p>
@@ -159,6 +162,7 @@
         また、その他で書いたように、仮に問題が解決できたとしても UTF-16 を完全に使わないようにはできず、また、UTF-8 にしてもある程度の前処理が必要となるため、思ったほどの効果が得られないことがわかりました（UTF-16 を扱うための構造体を実装済みだったことも大きいです）。この取り組みはしばらく放置することになりそうです。
     </p>
 
+</div>
         </div>
         <div class="content_lower">
             <div class="blog_prev_next_post">
@@ -173,7 +177,7 @@
     </div>
     <footer>
         <div class="footer_info">
-        Copyright &copy;2023 Yoshiyuki Koyama. All right reserved.
+        Copyright &copy; Yoshiyuki Koyama.
         <div class="footer_info">
     </footer>
 </body>
