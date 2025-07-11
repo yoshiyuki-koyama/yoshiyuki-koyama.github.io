@@ -39,26 +39,29 @@
         </div>
         <div class="content">
         
-    <h2>ソースコード</h2>
-    <p><a href="https://github.com/yoshiyuki-koyama/json_parser_serializer">GitHubリポジトリ</a></p>
-    <h2>概要</h2>
-    <p>
-        Rustで作成したJSONのパーサー&シリアライザーライブラリです。
-        JSONにあまり触れてこなかったので勉強もかねて作成しました。
-        なお、開発中の音声編集ソフトウェア(<a href="https://yoshiyuki-koyama.github.io/products/resonance_parrot.html">ResonanceParrot</a>)の設定ファイルをJSONにする予定なので、後々それに組み込もうと思っています。
-    </p>
-    <h2>機能</h2>
-    <ul>
-        <li>JSON文字列からRustの構造体(JsonObject)へのパース。</li>
-        <li>Rustの構造体(JsonObject)からJSON文字列へのシリアライズ。改行コード(LF or CRLF)とインデント(Tab or Space)の選択。</li>
-    </ul>
-    <h2>制限</h2>
-    <ul>
-        <li>JSONのObject内Memberの順序は保持されない。</li>
-        <li>JSONのNumber型をパースしたRustのコード上での型は、整数は<code>i64</code>、小数は<code>f64</code>で扱っているため、最大値・最小値・精度などはそれぞれの型に合わせ制限される。</li>
-        <li>JSONのNumber型で指数であらわしたものは、整数でも浮動小数点(<code>f64</code>)としてパースされる。</li>
-        <li>シリアライズ時、JSONのNumber型は整数・小数に限らず指数であらわした形にはならない。</li>
-    </ul>
+<h2>ソースコード</h2>
+<p>
+<a href="https://github.com/yoshiyuki-koyama/json_parser_serializer">GitHubリポジトリ</a>
+</p>
+<h2>概要</h2>
+<p>
+Rustで作成したJSONのパーサー&シリアライザーライブラリです。
+JSONにあまり触れてこなかったので勉強もかねて作成しました。
+なお、開発中の音声編集ソフトウェア(<a href="https://yoshiyuki-koyama.github.io/products/resonance_parrot.html">ResonanceParrot</a>の設定ファイルをJSONにする予定なので、後々それに組み込もうと思っています。
+</p>
+<h2>機能</h2>
+<ul>
+<li>JSON文字列からRustの構造体(JsonObject)へのパース。</li>
+<li>Rustの構造体(JsonObject)からJSON文字列へのシリアライズ。改行コード(LF or CRLF)とインデント(Tab or Space)の選択。</li>
+</ul>
+<h2>制限</h2>
+<ul>
+<li>JSONのObject内Memberの順序は保持されない。</li>
+<li>JSONのNumber型をパースしたRustのコード上での型は、整数は<code>i64</code>、小数は<code>f64</code>で扱っているため、最大値・最小値・精度などはそれぞれの型に合わせ制限される。</li>
+<li>JSONのNumber型で指数であらわしたものは、整数でも浮動小数点(<code>f64</code>)としてパースされる。</li>
+<li>シリアライズ時、JSONのNumber型は整数・小数に限らず指数であらわした形にはならない。</li>
+</ul>
+
 
         </div>
         <div class="content_lower">
